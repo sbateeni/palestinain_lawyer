@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="legal-library">
+    <!-- رأس الصفحة -->
+    <div class="page-header">
+        <h1 class="title">المكتبة القانونية</h1>
+        <p class="subtitle">مجموعة شاملة من المراجع والموارد القانونية</p>
+    </div>
+
+    <!-- شريط البحث -->
+    <div class="search-bar">
+        <div class="search-input">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="ابحث في المكتبة القانونية...">
+        </div>
+        <button class="gradient-btn primary add-reference" onclick="showAddReferenceModal()">
+            <i class="fas fa-plus"></i>
+            إضافة مرجع جديد
+        </button>
+    </div>
+
+    <!-- التصنيفات -->
+    <div class="categories-grid">
+        {% for category in categories %}
+        <div class="category-card" onclick="filterByCategory('{{ category.id }}')">
+            <div class="icon-wrapper">
+                <i class="fas {{ category.icon }}"></i>
+            </div>
+            <div class="category-content">
+                <h3>{{ category.name }}</h3>
+                <p>{{ category.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- قائمة المراجع -->
+    <div class="references-container">
+        <div class="references-header">
+            <h2>المراجع القانونية</h2>
+            <div class="view-options">
+                <button class="view-btn active" data-view="grid">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button class="view-btn" data-view="list">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="references-grid" id="referencesGrid">
+            {% for reference in references %}
+            <div class="reference-card" data-category="{{ reference.category_id }}">
+                <div class="card-header">
+                    <div class="type-badge">{{ reference.type }}</div>
+                    <div class="card-actions">
+                        <button class="action-btn" onclick="bookmarkReference('{{ reference.id }}')">
+                            <i class="far fa-bookmark"></i>
+                        </button>
+                        <button class="action-btn" onclick="downloadReference('{{ reference.id }}')">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <h3>{{ reference.title }}</h3>
+                    <p class="description">{{ reference.description }}</p>
+                    
+                    <div class="reference-meta">
+                        <span class="category">
+                            <i class="fas fa-folder"></i>
+                            {{ reference.category_name }}
+                        </span>
+                        <span class="views">
+                            <i class="fas fa-eye"></i>
+                            {{ reference.views_count }}
+                        </span>
+                        <span class="date">
+                            <i class="fas fa-calendar"></i>
+                            {{ reference.created_at|datetime }}
+                        </span>
+                    </div>
+
+                    <div class="tags">
+                        {% for tag in reference.tags %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <a href="{{ url_for('legal_library.view_reference', reference_id=reference.id) }}" 
+                       class="gradient-btn primary">عرض التفاصيل</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- نافذة إضافة مرجع جديد -->
+<div class="modal" id="addReferenceModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>إضافة مرجع جديد</h2>
+            <button class="close-btn" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form id="referenceForm">
+                <div class="form-group">
+                    <label>نوع المرجع</label>
+                    <select name="type" required>
+                        <option value="قانون">قانون</option>
+                        <option value="تشريع">تشريع</option>
+                        <option value="نموذج">نموذج قانوني</option>
+                        <option value="سابقة">سابقة قضائية</option>
+                        <option value="مرجع">مرجع قانوني</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>العنوان</label>
+                    <input type="text" name="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label>الوصف</label>
+                    <textarea name="description" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>المحتوى</label>
+                    <textarea name="content" rows="6" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>التصنيف</label>
+                    <select name="category_id" required>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>الكلمات المفتاحية</label>
+                    <div class="tags-input" id="tagsInput"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>الملف المرفق</label>
+                    <input type="file" name="file">
+                </div>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="gradient-btn primary" onclick="saveReference()">
+                <i class="fas fa-save"></i>
+                حفظ
+            </button>
+            <button class="gradient-btn" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+                إلغاء
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/legal_library.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/legal_library.js') }}"></script>
+{% endblock %} 

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="chat-page-container">
+    <!-- معلومات القضية -->
+    <div class="case-info-panel">
+        <div class="case-header">
+            <h2>
+                <i class="fas fa-file-alt"></i>
+                {{ case.title }}
+            </h2>
+            <div class="case-meta">
+                <span class="date">
+                    <i class="fas fa-calendar"></i>
+                    {{ case.date }}
+                </span>
+                <a href="/case/{{ case.id }}" class="back-link">
+                    <i class="fas fa-arrow-right"></i>
+                    العودة للقضية
+                </a>
+            </div>
+        </div>
+        <div class="case-summary">
+            {{ case.original_text[:300] + '...' if case.original_text|length > 300 else case.original_text }}
+        </div>
+    </div>
+
+    <!-- منطقة الدردشة -->
+    <div class="chat-container">
+        <!-- الأسئلة المقترحة -->
+        <div class="suggested-questions">
+            <h3>أسئلة مقترحة</h3>
+            <div class="questions-grid">
+                <button class="question-btn" data-question="ما هي النقاط القانونية الرئيسية في هذه القضية؟">
+                    <i class="fas fa-balance-scale"></i>
+                    النقاط القانونية الرئيسية
+                </button>
+                <button class="question-btn" data-question="ما هي الأدلة المطلوبة لتعزيز موقف الموكل؟">
+                    <i class="fas fa-search"></i>
+                    الأدلة المطلوبة
+                </button>
+                <button class="question-btn" data-question="ما هي احتمالات نجاح القضية؟">
+                    <i class="fas fa-chart-line"></i>
+                    احتمالات النجاح
+                </button>
+                <button class="question-btn" data-question="ما هي الإجراءات القانونية المقترحة؟">
+                    <i class="fas fa-tasks"></i>
+                    الإجراءات المقترحة
+                </button>
+            </div>
+        </div>
+
+        <!-- سجل المحادثة -->
+        <div class="chat-messages" id="chatMessages">
+            {% for message in case.chat_history %}
+            <div class="message {{ 'user-message' if message.is_user else 'bot-message' }}">
+                <div class="message-content">
+                    {{ message.content|safe }}
+                </div>
+                <div class="message-meta">
+                    <span class="timestamp">{{ message.timestamp }}</span>
+                    {% if not message.is_user %}
+                    <span class="model-badge {{ message.model }}">
+                        <i class="fas fa-robot"></i>
+                        {{ message.model }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- منطقة إدخال الرسائل -->
+        <div class="chat-input-area">
+            <div class="input-wrapper">
+                <textarea id="messageInput" placeholder="اكتب سؤالك هنا..." rows="3"></textarea>
+                <button id="sendMessage" class="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    إرسال
+                </button>
+            </div>
+            <div class="chat-actions">
+                <button class="action-btn" onclick="exportChat()">
+                    <i class="fas fa-file-pdf"></i>
+                    تصدير PDF
+                </button>
+                <button class="action-btn" onclick="clearChat()">
+                    <i class="fas fa-trash"></i>
+                    مسح المحادثة
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة تأكيد المسح -->
+<div id="clearConfirmation" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>تأكيد المسح</h3>
+        <p>هل أنت متأكد من مسح سجل المحادثة؟</p>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="cancelClear()">إلغاء</button>
+            <button class="btn btn-danger" onclick="confirmClear()">مسح</button>
+        </div>
+    </div>
+</div>
+<div id="overlay" class="overlay" style="display: none;"></div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %} 

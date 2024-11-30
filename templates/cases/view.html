@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="case-details-container">
+    <div class="case-header">
+        <h1>{{ case.title }}</h1>
+        <div class="case-meta">
+            <span class="date">{{ case.date }}</span>
+            <span class="status">{{ case.status }}</span>
+        </div>
+    </div>
+
+    <div class="case-actions">
+        <a href="/chat/{{ case.id }}" class="btn btn-primary">
+            <i class="fas fa-comments"></i>
+            الدردشة مع المساعد القانوني
+        </a>
+        <button onclick="exportCase()" class="btn btn-secondary">
+            <i class="fas fa-file-pdf"></i>
+            تصدير PDF
+        </button>
+        <button onclick="deleteCase()" class="btn btn-danger">
+            <i class="fas fa-trash"></i>
+            حذف القضية
+        </button>
+    </div>
+
+    <div class="case-content">
+        <div class="original-text">
+            <h2>النص الأصلي</h2>
+            <div class="text-content">
+                {{ case.original_text }}
+            </div>
+        </div>
+
+        <div class="analysis-stages">
+            <h2>مراحل التحليل</h2>
+            {% for stage_num, stage_data in case.stages.items() %}
+            <div class="stage-card">
+                <div class="stage-header">
+                    <h3>المرحلة {{ stage_num }}</h3>
+                    <span class="model-badge {{ stage_data.model }}">
+                        <i class="fas fa-robot"></i>
+                        {{ stage_data.model }}
+                    </span>
+                </div>
+                <div class="stage-content">
+                    {{ stage_data.content }}
+                </div>
+                <div class="stage-meta">
+                    <span class="timestamp">{{ stage_data.timestamp }}</span>
+                    <span class="status {{ stage_data.status }}">{{ stage_data.status }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/case_view.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/case_view.js') }}"></script>
+{% endblock %} 

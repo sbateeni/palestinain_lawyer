@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="ai-legal-search">
+    <div class="page-header">
+        <h1 class="title">البحث القانوني الذكي</h1>
+        <p class="subtitle">بحث وتحليل القوانين الفلسطينية باستخدام الذكاء الاصطناعي</p>
+    </div>
+
+    <div class="search-section">
+        <div class="search-box">
+            <textarea id="searchQuery" 
+                      placeholder="اكتب سؤالك القانوني هنا... مثال: ما هي شروط تسجيل شركة في فلسطين؟"
+                      rows="4"></textarea>
+            <button class="gradient-btn primary" onclick="performSearch()">
+                <i class="fas fa-search"></i>
+                بحث
+            </button>
+        </div>
+
+        <div class="quick-queries">
+            <h3>أمثلة على الأسئلة</h3>
+            <div class="query-chips">
+                <span class="chip" onclick="setQuery(this)">ما هي إجراءات رفع دعوى مدنية؟</span>
+                <span class="chip" onclick="setQuery(this)">كيف يتم تسجيل علامة تجارية؟</span>
+                <span class="chip" onclick="setQuery(this)">ما هي حقوق العامل عند الفصل التعسفي؟</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="results-section" id="resultsSection" style="display: none;">
+        <div class="results-header">
+            <h2>نتائج البحث</h2>
+            <div class="view-options">
+                <button class="view-btn active" data-view="summary">
+                    <i class="fas fa-list"></i>
+                    ملخص
+                </button>
+                <button class="view-btn" data-view="detailed">
+                    <i class="fas fa-th-large"></i>
+                    تفصيلي
+                </button>
+            </div>
+        </div>
+
+        <div class="results-content" id="resultsContent">
+            <!-- سيتم ملؤه ديناميكياً -->
+        </div>
+    </div>
+
+    <div class="analysis-section">
+        <h2>تحليل نص قانوني</h2>
+        <div class="analysis-input">
+            <textarea id="legalText" 
+                      placeholder="ضع النص القانوني هنا للتحليل..."
+                      rows="6"></textarea>
+            <button class="gradient-btn accent" onclick="analyzeLegalText()">
+                <i class="fas fa-microscope"></i>
+                تحليل النص
+            </button>
+        </div>
+        <div id="analysisResult" class="analysis-result" style="display: none;">
+            <!-- سيتم ملؤه ديناميكياً -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_legal_search.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/ai_legal_search.js') }}"></script>
+{% endblock %} 
